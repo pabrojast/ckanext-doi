@@ -90,6 +90,10 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
             if doi.published is None:
                 # metadata gets created before minting
+                #debug
+                print(xml_dict)
+                print(doi.identifier)
+                #end debug
                 client.set_metadata(doi.identifier, xml_dict)
                 client.mint_doi(doi.identifier, package_id)
                 toolkit.h.flash_success(f'{client.client_name} DataCite DOI created')
