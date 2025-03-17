@@ -11,7 +11,7 @@ Renders a citation for a package
         <div id="citation-string" class="citation-string">
             {% block default_citation_string %}
             {% if pkg_dict.get('author') and pkg_dict.get('title') %}
-                {{ pkg_dict.get('author') }} ({{ h.package_get_year(pkg_dict) }}). <i>{{ pkg_dict.get('title') }}</i> [Data set]. {{ pkg_dict.get('doi_publisher', '') }}             {% if not pkg_dict['doi_status'] %} . {% endif %}
+                {{ pkg_dict.get('author') }} ({{ h.package_get_year(pkg_dict) }}). <i>{{ pkg_dict.get('title') }}</i> [Data set]. {{ pkg_dict.get('doi_publisher', '') }}             {% if pkg_dict['doi_status'] %} . {% endif %}
                 {% block citation_link %}
                 {% if pkg_dict.get('doi') %}
                     {% set doi_link = 'https://doi.org/' + pkg_dict['doi'] %}
