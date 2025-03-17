@@ -96,7 +96,7 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 #end debug
                 client.set_metadata(doi.identifier, xml_dict)
                 client.mint_doi(doi.identifier, package_id)
-                toolkit.h.flash_success(f'{client.client_name} DataCite DOI created')
+                toolkit.h.flash_success(f'{client.client_name} DOI created')
             else:
                 same = client.check_for_update(doi.identifier, xml_dict)
                 if not same:
