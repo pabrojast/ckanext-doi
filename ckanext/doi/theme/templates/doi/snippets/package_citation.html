@@ -10,13 +10,19 @@ Renders a citation for a package
     <div class="citation">
         <div id="citation-string" class="citation-string">
             {% block default_citation_string %}
-            {{ pkg_dict['author'] }} ({{ h.package_get_year(pkg_dict) }}). <i>{{ pkg_dict['title'] }}</i> [Data set]. {{ pkg_dict['doi_publisher'] }}.
-            {% block citation_link %}
-            {% set doi_link = 'https://doi.org/' + pkg_dict['doi'] %}
-            <a href="{{ doi_link }}" target="_blank">
-                {{ doi_link }}
-            </a>
-            {% endblock %}
+            {% if pkg_dict.get('author') and pkg_dict.get('title') %}
+                {{ pkg_dict.get('author') }} ({{ h.package_get_year(pkg_dict) }}). <i>{{ pkg_dict.get('title') }}</i> [Data set]. {{ pkg_dict.get('doi_publisher', '') }}.
+                {% block citation_link %}
+                {% if pkg_dict.get('doi') %}
+                    {% set doi_link = 'https://doi.org/' + pkg_dict['doi'] %}
+                    <a href="{{ doi_link }}" target="_blank">
+                        {{ doi_link }}
+                    </a>
+                {% endif %}
+                {% endblock %}
+            {% else %}
+                <em>{{ _('Citation information not available') }}</em>
+            {% endif %}
             {% endblock %}
         </div>
 
