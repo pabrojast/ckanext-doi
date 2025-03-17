@@ -208,7 +208,7 @@ class CrossrefClient(DOIClient):
         :param xml_dict: the metadata as an xml dict (generated from build_xml_dict)
         :return:
         """
-        self.make_crossref_request(self, doi, xml_dict)
+        self.make_crossref_request(doi, xml_dict)
 
     def make_crossref_request(self, doi, xml_dict):
         error_msg = None
