@@ -369,7 +369,7 @@ def crossref_build_medatata_dict(pkg_dict):
             "timestamp": round(datetime.utcnow().timestamp()),
             "depositor": {
                 "depositor_name": toolkit.config.get("ckanext.doi.publisher", ""),
-                "email_address": toolkit.config.get("ckanext.doi.account_name", ""),
+                "email_address": toolkit.config.get("ckanext.doi.email", "projas@cazalac.org"),
             },
             "registrant": toolkit.config.get("ckanext.doi.account_name", ""),
         },
