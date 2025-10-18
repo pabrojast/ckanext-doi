@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "C:\\Users\\Lenovo\\Proyectos\\ckan-unesco-theme",
+      "C:\\Users\\Lenovo\\Proyectos\\ckanext-schemingdcat"
+    ]
+  }
+}

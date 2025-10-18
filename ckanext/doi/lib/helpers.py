@@ -4,6 +4,7 @@
 # This file is part of ckanext-doi
 # Created by the Natural History Museum in London, UK
 
+import json
 from datetime import datetime
 
 import dateutil.parser as parser
@@ -76,3 +77,24 @@ def get_doi_platform():
     """
 
     return toolkit.config.get('ckanext.doi.platform', 'datacite')
+
+
+def parse_json_authors(authors_json):
+    """
+    Helper function to parse JSON authors field in templates.
+    
+    :param authors_json: JSON string or list of authors
+    :return: list of author dictionaries or empty list
+    """
+    if not authors_json:
+        return []
+    
+    try:
+        if isinstance(authors_json, str):
+            return json.loads(authors_json)
+        elif isinstance(authors_json, list):
+            return authors_json
+    except (json.JSONDecodeError, TypeError):
+        pass
+    
+    return []

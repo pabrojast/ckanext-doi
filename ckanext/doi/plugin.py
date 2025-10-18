@@ -18,9 +18,11 @@ from ckanext.doi.lib.helpers import (
     package_get_year,
     doi_test_mode,
     get_doi_platform,
+    parse_json_authors,
 )
 from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict
 from ckanext.doi.model.crud import DOIQuery
+from ckanext.doi.views import get_blueprints
 
 log = getLogger(__name__)
 
@@ -34,6 +36,7 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.IPackageController, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
     implements(interfaces.IClick)
+    implements(interfaces.IBlueprint)
 
     ## IClick
     def get_commands(self):
@@ -147,4 +150,10 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'get_site_title': get_site_title,
             'doi_test_mode': doi_test_mode,
             'get_doi_platform': get_doi_platform,
+            'parse_json_authors': parse_json_authors,
         }
+
+    # IBlueprint
+    def get_blueprint(self):
+        """Return the blueprint for this plugin."""
+        return get_blueprints()

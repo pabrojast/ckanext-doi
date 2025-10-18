@@ -65,46 +65,8 @@ def datacite_build_medatata_dict(pkg_dict):
         except Exception as e:
             errors[key] = e
 
-    # CREATORS - Enhanced to support both legacy and new format
-    def get_creators():
-        creators = []
-        
-        # Check for new enhanced authors field first
-        enhanced_authors = pkg_dict.get('authors')
-        if enhanced_authors:
-            try:
-                import json
-                if isinstance(enhanced_authors, str):
-                    enhanced_authors = json.loads(enhanced_authors)
-                
-                for author in enhanced_authors:
-                    creator = {'full_name': author.get('name', '')}
-                    
-                    # Add ORCID if available
-                    if author.get('orcid'):
-                        creator['nameIdentifiers'] = [{
-                            'nameIdentifier': author['orcid'],
-                            'nameIdentifierScheme': 'ORCID',
-                            'schemeURI': 'https://orcid.org'
-                        }]
-                    
-                    # Add affiliation if available
-                    if author.get('affiliation'):
-                        creator['affiliations'] = [{'affiliation': author['affiliation']}]
-                    
-                    creators.append(creator)
-                    
-            except (json.JSONDecodeError, TypeError):
-                # Fallback to legacy format if JSON parsing fails
-                pass
-        
-        # Fallback to legacy author field if no enhanced authors or parsing failed
-        if not creators and pkg_dict.get('author'):
-            creators = [{'full_name': pkg_dict.get('author')}]
-            
-        return creators
-    
-    _add_required('creators', get_creators)
+    # CREATORS
+    _add_required('creators', lambda: [{'full_name': pkg_dict.get('author')}])
 
     # TITLES
     _add_required('titles', lambda: [{'title': pkg_dict.get('title')}])
