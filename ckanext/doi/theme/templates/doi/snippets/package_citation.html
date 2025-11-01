@@ -64,7 +64,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
                             <span class="author-name">{{ author.name }}</span>
                             {% if author.orcid %}
                                 <a href="https://orcid.org/{{ author.orcid }}" target="_blank" class="orcid-link" title="ORCID: {{ author.orcid }}">
-                                    <i class="fa fa-external-link-square"></i>
+                                    <img src="/orcid.svg" alt="ORCID iD" class="orcid-icon">
                                 </a>
                             {% endif %}
                             {% if author.affiliation %}
@@ -134,41 +134,118 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
 {# --- JavaScript for enhanced functionality --- #}
 <script type="text/javascript">
-$(document).ready(function() {
-    // Copy DOI to clipboard
-    $('.copy-doi-btn').click(function() {
-        var doi = $(this).data('doi');
-        navigator.clipboard.writeText(doi).then(function() {
-            // Show success message
-            var btn = $('.copy-doi-btn');
-            var originalText = btn.html();
-            btn.html('<i class="fa fa-check"></i>').addClass('btn-success');
+(function() {
+    'use strict';
+
+    // Wait for DOM to be ready
+    $(document).ready(function() {
+
+        // Copy DOI to clipboard
+        $('.copy-doi-btn').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var doi = $(this).data('doi');
+            var btn = $(this);
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(doi).then(function() {
+                    // Show success message
+                    var originalHtml = btn.html();
+                    btn.html('<i class="fa fa-check"></i>').addClass('btn-success');
+                    setTimeout(function() {
+                        btn.html(originalHtml).removeClass('btn-success');
+                    }, 2000);
+                }).catch(function(err) {
+                    console.error('Error copying DOI:', err);
+                    alert('{{ _("Error copying DOI. Please copy manually.") }}');
+                });
+            } else {
+                // Fallback for older browsers
+                var textArea = document.createElement('textarea');
+                textArea.value = doi;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    var originalHtml = btn.html();
+                    btn.html('<i class="fa fa-check"></i>').addClass('btn-success');
+                    setTimeout(function() {
+                        btn.html(originalHtml).removeClass('btn-success');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Error copying DOI:', err);
+                    alert('{{ _("Error copying DOI. Please copy manually.") }}');
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Copy citation to clipboard
+        $('.copy-citation').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var citation = $('#citation-string').text().trim();
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(citation).then(function() {
+                    alert('{{ _("Citation copied to clipboard!") }}');
+                }).catch(function(err) {
+                    console.error('Error copying citation:', err);
+                    alert('{{ _("Error copying citation. Please copy manually.") }}');
+                });
+            } else {
+                // Fallback for older browsers
+                var textArea = document.createElement('textarea');
+                textArea.value = citation;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('{{ _("Citation copied to clipboard!") }}');
+                } catch (err) {
+                    console.error('Error copying citation:', err);
+                    alert('{{ _("Error copying citation. Please copy manually.") }}');
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Export citation in different formats
+        $('.export-citation').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var format = $(this).data('format');
+            var packageId = '{{ pkg_dict.id }}';
+
+            if (!format) {
+                console.error('No format specified for export');
+                return;
+            }
+
+            // Construct the export URL
+            var exportUrl = '/dataset/' + packageId + '/export_citation?format=' + format;
+
+            // Create a temporary link and click it to trigger download
+            var link = document.createElement('a');
+            link.href = exportUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up
             setTimeout(function() {
-                btn.html(originalText).removeClass('btn-success');
-            }, 2000);
+                document.body.removeChild(link);
+            }, 100);
         });
     });
-
-    // Copy citation to clipboard
-    $('.copy-citation').click(function(e) {
-        e.preventDefault();
-        var citation = $('#citation-string').text().trim();
-        navigator.clipboard.writeText(citation).then(function() {
-            // Show success message
-            alert('{{ _("Citation copied to clipboard!") }}');
-        });
-    });
-
-    // Export citation in different formats
-    $('.export-citation').click(function(e) {
-        e.preventDefault();
-        var format = $(this).data('format');
-        var packageId = '{{ pkg_dict.id }}';
-        
-        // Make AJAX call to export endpoint
-        window.open('/dataset/' + packageId + '/export_citation?format=' + format, '_blank');
-    });
-});
+})();
 </script>
 
 {# --- CSS Styles for Zenodo-like appearance --- #}
@@ -234,13 +311,21 @@ $(document).ready(function() {
 }
 
 .orcid-link {
-    color: #a6ce39;
     margin-left: 3px;
     text-decoration: none;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .orcid-link:hover {
-    color: #8bb82e;
+    opacity: 0.8;
+}
+
+.orcid-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    display: inline-block;
 }
 
 .author-affiliation {
