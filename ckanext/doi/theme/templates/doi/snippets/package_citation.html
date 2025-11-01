@@ -134,7 +134,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
 {# --- JavaScript for enhanced functionality --- #}
 <script type="text/javascript">
-(function() {
+(function($) {
     'use strict';
 
     // Wait for DOM to be ready
@@ -245,7 +245,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
             }, 100);
         });
     });
-})();
+})(jQuery);
 </script>
 
 {# --- CSS Styles for Zenodo-like appearance --- #}
