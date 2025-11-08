@@ -134,11 +134,19 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
 {# --- JavaScript for enhanced functionality --- #}
 <script type="text/javascript">
-(function($) {
+// Ensure jQuery is loaded before executing
+(function() {
     'use strict';
 
-    // Wait for DOM to be ready
-    $(document).ready(function() {
+    function initializeCitationHandlers() {
+        var $ = window.jQuery;
+        if (!$) {
+            console.error('jQuery is not available');
+            return;
+        }
+
+        // Wait for DOM to be ready
+        $(document).ready(function() {
 
         // Copy DOI to clipboard
         $('.copy-doi-btn').on('click', function(e) {
@@ -244,8 +252,30 @@ Enhanced citation template with Zenodo-style layout and DOI information
                 document.body.removeChild(link);
             }, 100);
         });
-    });
-})(jQuery);
+        }); // End of $(document).ready
+    } // End of initializeCitationHandlers
+
+    // Wait for jQuery to be available
+    if (window.jQuery) {
+        initializeCitationHandlers();
+    } else {
+        // Check periodically if jQuery is loaded
+        var checkJQuery = setInterval(function() {
+            if (window.jQuery) {
+                clearInterval(checkJQuery);
+                initializeCitationHandlers();
+            }
+        }, 100);
+
+        // Timeout after 10 seconds
+        setTimeout(function() {
+            clearInterval(checkJQuery);
+            if (!window.jQuery) {
+                console.error('jQuery failed to load after 10 seconds');
+            }
+        }, 10000);
+    }
+})();
 </script>
 
 {# --- CSS Styles for Zenodo-like appearance --- #}
