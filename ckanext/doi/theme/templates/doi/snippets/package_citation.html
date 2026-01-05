@@ -91,17 +91,17 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
         {# --- Citation Export Dropdown --- #}
         <div class="citation-export">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-default btn-light dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-download"></i> {{ _('Export Citation') }} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="export-citation" data-format="bibtex"><i class="fa fa-file-text-o"></i> BibTeX</a></li>
-                    <li><a href="#" class="export-citation" data-format="ris"><i class="fa fa-file-text-o"></i> RIS</a></li>
-                    <li><a href="#" class="export-citation" data-format="endnote"><i class="fa fa-file-text-o"></i> EndNote</a></li>
-                    <li><a href="#" class="export-citation" data-format="apa"><i class="fa fa-file-text-o"></i> APA</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="bibtex"><i class="fa fa-file-text-o"></i> BibTeX</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="ris"><i class="fa fa-file-text-o"></i> RIS</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="endnote"><i class="fa fa-file-text-o"></i> EndNote</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="apa"><i class="fa fa-file-text-o"></i> APA</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="#" class="copy-citation"><i class="fa fa-copy"></i> {{ _('Copy to Clipboard') }}</a></li>
+                    <li><a href="#" class="dropdown-item copy-citation"><i class="fa fa-copy"></i> {{ _('Copy to Clipboard') }}</a></li>
                 </ul>
             </div>
         </div>
@@ -365,6 +365,26 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
 .citation-export {
     padding: 0 15px 15px;
+}
+
+.citation-export .dropdown-menu {
+    margin-top: 4px;
+}
+
+.citation-export .dropdown-menu.show,
+.citation-export .open > .dropdown-menu {
+    top: 100% !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    transform: translate3d(0, 0, 0) !important;
+}
+
+.citation-export .dropdown-menu .divider {
+    height: 1px;
+    margin: 4px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
 }
 
 .doi-status-info {
