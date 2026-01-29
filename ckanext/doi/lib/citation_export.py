@@ -4,10 +4,9 @@
 # This file is part of ckanext-doi
 # Created by the Natural History Museum in London, UK
 
-import json
 from datetime import datetime
 from ckan.plugins import toolkit
-from ckanext.doi.lib.helpers import package_get_year
+from ckanext.doi.lib.helpers import package_get_year, parse_json_authors
 
 
 def get_authors_list(pkg_dict):
@@ -18,21 +17,15 @@ def get_authors_list(pkg_dict):
     authors = []
     
     # Check for enhanced authors field first
-    enhanced_authors = pkg_dict.get('authors')
+    enhanced_authors = pkg_dict.get('authors') or pkg_dict.get('authors_json')
     if enhanced_authors:
-        try:
-            if isinstance(enhanced_authors, str):
-                enhanced_authors = json.loads(enhanced_authors)
-            
-            for author in enhanced_authors:
-                authors.append({
-                    'name': author.get('name', ''),
-                    'orcid': author.get('orcid', ''),
-                    'affiliation': author.get('affiliation', ''),
-                    'email': author.get('email', '')
-                })
-        except (json.JSONDecodeError, TypeError):
-            pass
+        for author in parse_json_authors(enhanced_authors):
+            authors.append({
+                'name': author.get('name', ''),
+                'orcid': author.get('orcid', ''),
+                'affiliation': author.get('affiliation', ''),
+                'email': author.get('email', '')
+            })
     
     # Fallback to legacy author field
     if not authors and pkg_dict.get('author'):

@@ -82,19 +82,86 @@ def get_doi_platform():
 def parse_json_authors(authors_json):
     """
     Helper function to parse JSON authors field in templates.
-    
-    :param authors_json: JSON string or list of authors
+
+    Normalizes common author shapes into a list of dicts with "name" and
+    optional "given_name", "family_name", "orcid", "affiliation".
+
+    :param authors_json: JSON string, list, dict, or string of authors
     :return: list of author dictionaries or empty list
     """
     if not authors_json:
         return []
-    
+
     try:
         if isinstance(authors_json, str):
-            return json.loads(authors_json)
+            authors = json.loads(authors_json)
         elif isinstance(authors_json, list):
-            return authors_json
-    except (json.JSONDecodeError, TypeError):
-        pass
-    
-    return []
+            authors = authors_json
+        elif isinstance(authors_json, dict):
+            authors = [authors_json]
+        else:
+            return []
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return []
+
+    normalized = []
+    for author in authors:
+        if isinstance(author, str):
+            name = author.strip()
+            if name:
+                normalized.append({'name': name})
+            continue
+
+        if not isinstance(author, dict):
+            continue
+
+        given_name = author.get('given_name') or author.get('given') or author.get('first_name')
+        family_name = author.get('family_name') or author.get('family') or author.get('last_name')
+        name = author.get('name') or author.get('full_name')
+
+        if not name:
+            if given_name and family_name:
+                name = f'{given_name} {family_name}'
+            elif family_name:
+                name = family_name
+            elif given_name:
+                name = given_name
+
+        if not name:
+            continue
+
+        orcid = author.get('orcid') or author.get('ORCID') or author.get('orcid_id')
+        if isinstance(orcid, str):
+            orcid = orcid.strip()
+            if 'orcid.org/' in orcid:
+                orcid = orcid.split('orcid.org/')[-1]
+
+        affiliation = author.get('affiliation') or author.get('affiliations')
+        if isinstance(affiliation, list):
+            if affiliation:
+                first = affiliation[0]
+                if isinstance(first, dict):
+                    affiliation = first.get('name') or first.get('affiliation')
+                else:
+                    affiliation = first
+            else:
+                affiliation = None
+        elif isinstance(affiliation, dict):
+            affiliation = affiliation.get('name') or affiliation.get('affiliation')
+
+        author_dict = {'name': name}
+        if given_name:
+            author_dict['given_name'] = given_name
+        if family_name:
+            author_dict['family_name'] = family_name
+        if orcid:
+            author_dict['orcid'] = orcid
+        if affiliation:
+            author_dict['affiliation'] = affiliation
+        email = author.get('email') or author.get('mail')
+        if email:
+            author_dict['email'] = email
+
+        normalized.append(author_dict)
+
+    return normalized

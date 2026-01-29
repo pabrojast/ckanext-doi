@@ -21,7 +21,8 @@ from ckanext.doi.lib.helpers import (
     date_or_none,
     get_site_url,
     package_get_year,
-    get_doi_platform
+    get_doi_platform,
+    parse_json_authors,
     )
 
 log = logging.getLogger(__name__)
@@ -68,36 +69,37 @@ def datacite_build_medatata_dict(pkg_dict):
     # CREATORS - Enhanced to support both legacy and new format
     def get_creators():
         creators = []
-        
-        # Check for new enhanced authors field first
-        enhanced_authors = pkg_dict.get('authors')
+
+        # Check for enhanced authors fields first (authors/authors_json)
+        enhanced_authors = pkg_dict.get('authors') or pkg_dict.get('authors_json')
         if enhanced_authors:
-            try:
-                import json
-                if isinstance(enhanced_authors, str):
-                    enhanced_authors = json.loads(enhanced_authors)
-                
-                for author in enhanced_authors:
-                    creator = {'full_name': author.get('name', '')}
-                    
-                    # Add ORCID if available
-                    if author.get('orcid'):
-                        creator['nameIdentifiers'] = [{
-                            'nameIdentifier': author['orcid'],
-                            'nameIdentifierScheme': 'ORCID',
-                            'schemeURI': 'https://orcid.org'
-                        }]
-                    
-                    # Add affiliation if available
-                    if author.get('affiliation'):
-                        creator['affiliations'] = [{'affiliation': author['affiliation']}]
-                    
+            for author in parse_json_authors(enhanced_authors):
+                creator = {}
+                full_name = author.get('name')
+                if full_name:
+                    creator['full_name'] = full_name
+                if author.get('family_name'):
+                    creator['family_name'] = author.get('family_name')
+                if author.get('given_name'):
+                    creator['given_name'] = author.get('given_name')
+
+                # Add ORCID if available
+                if author.get('orcid'):
+                    creator['identifiers'] = [{
+                        'identifier': author['orcid'],
+                        'scheme': 'ORCID',
+                        'scheme_uri': 'https://orcid.org'
+                    }]
+
+                # Add affiliation if available
+                if author.get('affiliation'):
+                    creator['affiliations'] = author['affiliation']
+
+                if creator.get('full_name') or (
+                    creator.get('family_name') and creator.get('given_name')
+                ):
                     creators.append(creator)
-                    
-            except (json.JSONDecodeError, TypeError):
-                # Fallback to legacy format if JSON parsing fails
-                pass
-        
+
         # Fallback to legacy author field if no enhanced authors or parsing failed
         if not creators and pkg_dict.get('author'):
             creators = [{'full_name': pkg_dict.get('author')}]

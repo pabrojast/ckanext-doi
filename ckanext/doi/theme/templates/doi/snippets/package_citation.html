@@ -51,7 +51,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
                 {# --- 2) Enhanced citation with new authors format -------------------- #}
                 {% else %}
-                    {% set authors_data = pkg_dict.get('authors') %}
+                    {% set authors_data = pkg_dict.get('authors') or pkg_dict.get('authors_json') %}
                     {% set legacy_author = pkg_dict.get('author') %}
                     
                     {# Parse enhanced authors if available #}
