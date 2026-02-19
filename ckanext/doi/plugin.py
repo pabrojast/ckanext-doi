@@ -67,6 +67,10 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         Check status of the dataset to determine if we should publish DOI to datacite
         network.
         """
+        if self._is_background_internal_update(context):
+            log.debug('Skipping DOI update for internal background metadata update')
+            return pkg_dict
+
         # Is this active and public? If so we need to make sure we have an active DOI
         if not toolkit.config.get('ckanext.doi.disable_on_update', False) and pkg_dict.get(
             'state', 'active') == 'active' and not pkg_dict.get(
@@ -93,21 +97,46 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
             if doi.published is None:
                 # metadata gets created before minting
-                #debug
-                print(xml_dict)
-                print(doi.identifier)
-                #end debug
                 client.set_metadata(doi.identifier, xml_dict)
                 client.mint_doi(doi.identifier, package_id)
-                toolkit.h.flash_success(f'{client.client_name} DOI created')
+                self._flash_success_safe(f'{client.client_name} DOI created')
             else:
                 same = client.check_for_update(doi.identifier, xml_dict)
                 if not same:
                     # Not the same, so we want to update the metadata
                     client.set_metadata(doi.identifier, xml_dict)
-                    toolkit.h.flash_success(f'{client.client_name} DOI metadata updated')
+                    self._flash_success_safe(f'{client.client_name} DOI metadata updated')
 
         return pkg_dict
+
+    def _is_background_internal_update(self, context):
+        context = context or {}
+        return bool(
+            context.get('_schemingdcat_metadata_job') or
+            context.get('_skip_doi_update')
+        )
+
+    def _flash_success_safe(self, message):
+        """
+        Flash helpers require a request context and a configured secret_key.
+        Background updates (jobs/threads) should not attempt UI flashes.
+        """
+        try:
+            from flask import has_request_context, current_app
+            if not has_request_context():
+                log.debug('Skipping flash_success outside request context')
+                return
+            if not getattr(current_app, 'secret_key', None):
+                log.warning('Skipping flash_success because app.secret_key is empty')
+                return
+        except Exception as e:
+            log.debug(f'Skipping flash_success due to context check error: {e}')
+            return
+
+        try:
+            toolkit.h.flash_success(message)
+        except Exception as e:
+            log.warning(f'Could not flash DOI message: {e}')
 
     # IPackageController
     def after_dataset_show(self, context, pkg_dict):
