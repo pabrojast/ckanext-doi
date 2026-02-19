@@ -4,10 +4,55 @@
 # This file is part of ckanext-doi
 # Created by the Natural History Museum in London, UK
 
-import json
 from datetime import datetime
 from ckan.plugins import toolkit
-from ckanext.doi.lib.helpers import package_get_year
+from ckanext.doi.lib.helpers import package_get_year, parse_json_authors
+
+
+def get_title(pkg_dict):
+    """
+    Return the best available title for the dataset, falling back to translated titles.
+    """
+    title = pkg_dict.get('title') or ''
+    if title:
+        return title
+
+    translated = pkg_dict.get('title_translated')
+    if isinstance(translated, dict):
+        title = translated.get('en') or ''
+        if title:
+            return title
+        for value in translated.values():
+            if value:
+                return value
+
+    return pkg_dict.get('name', 'Untitled Dataset')
+
+
+def get_publication_year(pkg_dict):
+    """
+    Prefer an explicit publication_year field, otherwise derive it from metadata_created.
+    """
+    year = pkg_dict.get('publication_year')
+    if year:
+        return year
+
+    try:
+        return package_get_year(pkg_dict)
+    except Exception:
+        return ''
+
+
+def get_publisher(pkg_dict):
+    """
+    Prefer DOI publisher overrides, then publisher_name/publisher fields, then config default.
+    """
+    return (
+        pkg_dict.get('doi_publisher')
+        or pkg_dict.get('publisher_name')
+        or pkg_dict.get('publisher')
+        or toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher')
+    )
 
 
 def get_authors_list(pkg_dict):
@@ -18,21 +63,15 @@ def get_authors_list(pkg_dict):
     authors = []
     
     # Check for enhanced authors field first
-    enhanced_authors = pkg_dict.get('authors')
+    enhanced_authors = pkg_dict.get('authors') or pkg_dict.get('authors_json')
     if enhanced_authors:
-        try:
-            if isinstance(enhanced_authors, str):
-                enhanced_authors = json.loads(enhanced_authors)
-            
-            for author in enhanced_authors:
-                authors.append({
-                    'name': author.get('name', ''),
-                    'orcid': author.get('orcid', ''),
-                    'affiliation': author.get('affiliation', ''),
-                    'email': author.get('email', '')
-                })
-        except (json.JSONDecodeError, TypeError):
-            pass
+        for author in parse_json_authors(enhanced_authors):
+            authors.append({
+                'name': author.get('name', ''),
+                'orcid': author.get('orcid', ''),
+                'affiliation': author.get('affiliation', ''),
+                'email': author.get('email', '')
+            })
     
     # Fallback to legacy author field
     if not authors and pkg_dict.get('author'):
@@ -50,6 +89,8 @@ def get_doi_url(pkg_dict):
     """Get the DOI URL, preferring custom DOI over generated DOI."""
     if pkg_dict.get('custom_doi'):
         return pkg_dict['custom_doi']
+    elif pkg_dict.get('document_doi'):
+        return f"https://doi.org/{pkg_dict['document_doi']}"
     elif pkg_dict.get('doi'):
         return f"https://doi.org/{pkg_dict['doi']}"
     return ""
@@ -59,7 +100,9 @@ def export_bibtex(pkg_dict):
     """Export citation in BibTeX format."""
     authors = get_authors_list(pkg_dict)
     doi_url = get_doi_url(pkg_dict)
-    year = package_get_year(pkg_dict)
+    year = get_publication_year(pkg_dict) or 'n.d.'
+    title = get_title(pkg_dict)
+    publisher = get_publisher(pkg_dict)
     
     # Create author string
     author_names = [author['name'] for author in authors if author['name']]
@@ -69,10 +112,10 @@ def export_bibtex(pkg_dict):
     bibtex_id = pkg_dict.get('name', pkg_dict.get('id', 'dataset'))
     
     bibtex = f"""@dataset{{{bibtex_id},
-    title = {{{pkg_dict.get('title', 'Untitled Dataset')}}},
+    title = {{{title}}},
     author = {{{author_str}}},
     year = {{{year}}},
-    publisher = {{{pkg_dict.get('doi_publisher', toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher'))}}},"""
+    publisher = {{{publisher}}},"""
     
     if doi_url:
         bibtex += f"\n    doi = {{{doi_url.replace('https://doi.org/', '')}}},"
@@ -92,10 +135,12 @@ def export_ris(pkg_dict):
     """Export citation in RIS format."""
     authors = get_authors_list(pkg_dict)
     doi_url = get_doi_url(pkg_dict)
-    year = package_get_year(pkg_dict)
+    year = get_publication_year(pkg_dict) or 'n.d.'
+    title = get_title(pkg_dict)
+    publisher = get_publisher(pkg_dict)
     
     ris = "TY  - DATA\n"
-    ris += f"TI  - {pkg_dict.get('title', 'Untitled Dataset')}\n"
+    ris += f"TI  - {title}\n"
     
     # Add authors
     for author in authors:
@@ -103,7 +148,7 @@ def export_ris(pkg_dict):
             ris += f"AU  - {author['name']}\n"
     
     ris += f"PY  - {year}\n"
-    ris += f"PB  - {pkg_dict.get('doi_publisher', toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher'))}\n"
+    ris += f"PB  - {publisher}\n"
     
     if doi_url:
         ris += f"DO  - {doi_url.replace('https://doi.org/', '')}\n"
@@ -121,10 +166,12 @@ def export_endnote(pkg_dict):
     """Export citation in EndNote format."""
     authors = get_authors_list(pkg_dict)
     doi_url = get_doi_url(pkg_dict)
-    year = package_get_year(pkg_dict)
+    year = get_publication_year(pkg_dict) or 'n.d.'
+    title = get_title(pkg_dict)
+    publisher = get_publisher(pkg_dict)
     
     endnote = "%0 Dataset\n"
-    endnote += f"%T {pkg_dict.get('title', 'Untitled Dataset')}\n"
+    endnote += f"%T {title}\n"
     
     # Add authors
     for author in authors:
@@ -132,7 +179,7 @@ def export_endnote(pkg_dict):
             endnote += f"%A {author['name']}\n"
     
     endnote += f"%D {year}\n"
-    endnote += f"%I {pkg_dict.get('doi_publisher', toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher'))}\n"
+    endnote += f"%I {publisher}\n"
     
     if doi_url:
         endnote += f"%R {doi_url.replace('https://doi.org/', '')}\n"
@@ -148,7 +195,9 @@ def export_apa(pkg_dict):
     """Export citation in APA format."""
     authors = get_authors_list(pkg_dict)
     doi_url = get_doi_url(pkg_dict)
-    year = package_get_year(pkg_dict)
+    year = get_publication_year(pkg_dict) or 'n.d.'
+    title = get_title(pkg_dict)
+    publisher = get_publisher(pkg_dict)
     
     # Format authors for APA
     if len(authors) == 0:
@@ -163,8 +212,8 @@ def export_apa(pkg_dict):
     
     # Build APA citation
     apa = f"{author_str} ({year}). "
-    apa += f"<em>{pkg_dict.get('title', 'Untitled Dataset')}</em> [Data set]. "
-    apa += f"{pkg_dict.get('doi_publisher', toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher'))}"
+    apa += f"<em>{title}</em> [Data set]. "
+    apa += f"{publisher}"
     
     if doi_url:
         apa += f". {doi_url}"

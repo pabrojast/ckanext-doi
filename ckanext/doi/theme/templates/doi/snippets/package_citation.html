@@ -7,6 +7,43 @@ Enhanced citation template with Zenodo-style layout and DOI information
     <h3>{{ _('Cite this as') }}</h3>
 
     <div class="citation-container">
+        {% set authors_data = pkg_dict.get('authors') or pkg_dict.get('authors_json') %}
+        {% set legacy_author = pkg_dict.get('author') %}
+        {% set authors = h.parse_json_authors(authors_data) if authors_data else [] %}
+        {% set title = pkg_dict.get('title') %}
+        {% set pub_year = pkg_dict.get('publication_year') %}
+        {% set publisher = pkg_dict.get('doi_publisher') or pkg_dict.get('publisher_name') or pkg_dict.get('publisher') %}
+        {% set doi_link = None %}
+
+        {# Fallback to translated titles when a plain title is not present #}
+        {% if not title and pkg_dict.get('title_translated') is mapping %}
+            {% set title = pkg_dict['title_translated'].get('en') %}
+            {% if not title %}
+                {% for val in pkg_dict['title_translated'].values() %}
+                    {% if val %}
+                        {% set title = val %}
+                        {% break %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
+        {# Prefer explicitly provided publication year; otherwise derive it #}
+        {% if not pub_year and pkg_dict.get('metadata_created') %}
+            {% set pub_year = h.package_get_year(pkg_dict) %}
+        {% endif %}
+
+        {% if pkg_dict.get('custom_doi') %}
+            {% set doi_link = pkg_dict['custom_doi'] %}
+        {% elif pkg_dict.get('document_doi') %}
+            {% set doi_link = 'https://doi.org/' + pkg_dict['document_doi'] %}
+        {% elif pkg_dict.get('doi') %}
+            {% set doi_link = 'https://doi.org/' + pkg_dict['doi'] %}
+        {% endif %}
+
+        {% set resource_label = '[Document]' if pkg_dict.get('type') in ['documents', 'document'] else '[Data set]' %}
+        {% set has_citation_bits = authors or legacy_author or title or publisher or doi_link or pub_year %}
+
         {# --- DOI Information Bar (Zenodo-style) --- #}
         {% if pkg_dict.get('doi') or pkg_dict.get('custom_doi') %}
         <div class="doi-bar">
@@ -49,19 +86,23 @@ Enhanced citation template with Zenodo-style layout and DOI information
                 {% if pkg_dict.get('custom_citation') %}
                     {{ pkg_dict.get('custom_citation')|safe }}
 
+                {# --- 1b) Auto-generated citation field (documents schema) ----------- #}
+                {% elif pkg_dict.get('citation') %}
+                    {{ pkg_dict.get('citation')|safe }}
+
                 {# --- 2) Enhanced citation with new authors format -------------------- #}
-                {% else %}
-                    {% set authors_data = pkg_dict.get('authors') %}
-                    {% set legacy_author = pkg_dict.get('author') %}
-                    
-                    {# Parse enhanced authors if available #}
-                    {% if authors_data %}
-                        {% set authors = h.parse_json_authors(authors_data) %}
-                        
-                        {# Display enhanced authors with ORCID and affiliations #}
+                {% elif has_citation_bits %}
+                    {# Parse and render enhanced authors #}
+                    {% if authors %}
                         {% for author in authors %}
                             {% if loop.index > 1 %}, {% endif %}
-                            <span class="author-name">{{ author.name }}</span>
+                            {% set author_name = author.name %}
+                            {% if not author_name %}
+                                {% set author_name = (author.get('family_name', '') ~ ' ' ~ author.get('given_name', ''))|trim %}
+                            {% endif %}
+                            {% if author_name %}
+                                <span class="author-name">{{ author_name }}</span>
+                            {% endif %}
                             {% if author.orcid %}
                                 <a href="https://orcid.org/{{ author.orcid }}" target="_blank" class="orcid-link" title="ORCID: {{ author.orcid }}">
                                     <img src="/orcid.svg" alt="ORCID iD" class="orcid-icon">
@@ -71,37 +112,46 @@ Enhanced citation template with Zenodo-style layout and DOI information
                                 <span class="author-affiliation"> ({{ author.affiliation }})</span>
                             {% endif %}
                         {% endfor %}
-                        
+
                     {# Fallback to legacy author field #}
                     {% elif legacy_author %}
                         <span class="author-name">{{ legacy_author }}</span>
                     {% endif %}
-                    
-                    {% if (authors_data or legacy_author) and pkg_dict.get('title') %}
-                        ({{ h.package_get_year(pkg_dict) }}). 
-                        <i>{{ pkg_dict.get('title') }}</i> [Data set]. 
-                        {{ pkg_dict.get('doi_publisher', '') }}
-                        {% if pkg_dict['doi_status'] %}.{% endif %}
-                    {% else %}
-                        <em>{{ _('Citation information not available') }}</em>
+
+                    {% if pub_year %}
+                        ({{ pub_year }}).
                     {% endif %}
+
+                    {% if title %}
+                        <i>{{ title }}</i> {{ resource_label }}.
+                    {% endif %}
+
+                    {% if publisher %}
+                        {{ publisher }}.
+                    {% endif %}
+
+                    {% if doi_link %}
+                        {{ doi_link }}
+                    {% endif %}
+                {% else %}
+                    <em>{{ _('Citation information not available') }}</em>
                 {% endif %}
             </div>
         </div>
 
         {# --- Citation Export Dropdown --- #}
         <div class="citation-export">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-default btn-light dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-download"></i> {{ _('Export Citation') }} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="export-citation" data-format="bibtex"><i class="fa fa-file-text-o"></i> BibTeX</a></li>
-                    <li><a href="#" class="export-citation" data-format="ris"><i class="fa fa-file-text-o"></i> RIS</a></li>
-                    <li><a href="#" class="export-citation" data-format="endnote"><i class="fa fa-file-text-o"></i> EndNote</a></li>
-                    <li><a href="#" class="export-citation" data-format="apa"><i class="fa fa-file-text-o"></i> APA</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="bibtex"><i class="fa fa-file-text-o"></i> BibTeX</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="ris"><i class="fa fa-file-text-o"></i> RIS</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="endnote"><i class="fa fa-file-text-o"></i> EndNote</a></li>
+                    <li><a href="#" class="dropdown-item export-citation" data-format="apa"><i class="fa fa-file-text-o"></i> APA</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="#" class="copy-citation"><i class="fa fa-copy"></i> {{ _('Copy to Clipboard') }}</a></li>
+                    <li><a href="#" class="dropdown-item copy-citation"><i class="fa fa-copy"></i> {{ _('Copy to Clipboard') }}</a></li>
                 </ul>
             </div>
         </div>
@@ -365,6 +415,26 @@ Enhanced citation template with Zenodo-style layout and DOI information
 
 .citation-export {
     padding: 0 15px 15px;
+}
+
+.citation-export .dropdown-menu {
+    margin-top: 4px;
+}
+
+.citation-export .dropdown-menu.show,
+.citation-export .open > .dropdown-menu {
+    top: 100% !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    transform: translate3d(0, 0, 0) !important;
+}
+
+.citation-export .dropdown-menu .divider {
+    height: 1px;
+    margin: 4px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
 }
 
 .doi-status-info {
