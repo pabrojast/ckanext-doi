@@ -4,6 +4,9 @@
 # This file is part of ckanext-doi
 # Created by the Natural History Museum in London, UK
 
+import copy
+import hashlib
+import json
 import logging
 import uuid
 from datetime import datetime
@@ -487,3 +490,29 @@ def crossref_build_xml_dict(metadata_dict):
     e= _dict_to_xml('doi_batch', metadata_dict)
 
     return str(tostring(e, encoding='utf8', method='xml').decode('utf8'))
+
+
+def compute_metadata_hash(metadata_dict, platform):
+    """
+    Compute a stable hash of the metadata dict, excluding fields that change
+    on every call (dynamic fields) so we can detect real metadata changes.
+
+    :param metadata_dict: the metadata dict from build_metadata_dict
+    :param platform: 'datacite' or 'crossref'
+    :return: hex digest string
+    """
+    d = copy.deepcopy(metadata_dict)
+
+    if platform == 'crossref':
+        # Remove Crossref dynamic fields that change on every call
+        if 'head' in d:
+            d['head'].pop('doi_batch_id', None)
+            d['head'].pop('timestamp', None)
+    elif platform == 'datacite':
+        # Remove the 'Updated' date which reflects metadata_modified and
+        # changes every time package_update is called, even with identical data
+        dates = d.get('dates', [])
+        d['dates'] = [date for date in dates if date.get('dateType') != 'Updated']
+
+    serialized = json.dumps(d, sort_keys=True, default=str)
+    return hashlib.sha256(serialized.encode('utf-8')).hexdigest()

@@ -20,7 +20,7 @@ from ckanext.doi.lib.helpers import (
     get_doi_platform,
     parse_json_authors,
 )
-from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict
+from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict, compute_metadata_hash
 from ckanext.doi.model.crud import DOIQuery
 from ckanext.doi.views import get_blueprints
 
@@ -91,6 +91,18 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             doi = DOIQuery.read_package(package_id, create_if_none=True)
 
             metadata_dict: dict[str, Any] = build_metadata_dict(pkg_show_dict)
+
+            # Compute a stable hash of the meaningful metadata to detect real changes
+            platform = toolkit.config.get('ckanext.doi.platform', 'datacite')
+            metadata_hash = compute_metadata_hash(metadata_dict, platform)
+
+            # Skip update if metadata hasn't actually changed
+            if doi.published is not None and doi.metadata_hash == metadata_hash:
+                log.debug(
+                    f'DOI {doi.identifier} metadata unchanged (hash match), skipping update'
+                )
+                return pkg_dict
+
             xml_dict = build_xml_dict(metadata_dict)
 
             client = get_client()
@@ -99,12 +111,14 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 # metadata gets created before minting
                 client.set_metadata(doi.identifier, xml_dict)
                 client.mint_doi(doi.identifier, package_id)
+                DOIQuery.update_doi(doi.identifier, metadata_hash=metadata_hash)
                 self._flash_success_safe(f'{client.client_name} DOI created')
             else:
                 same = client.check_for_update(doi.identifier, xml_dict)
                 if not same:
                     # Not the same, so we want to update the metadata
                     client.set_metadata(doi.identifier, xml_dict)
+                    DOIQuery.update_doi(doi.identifier, metadata_hash=metadata_hash)
                     self._flash_success_safe(f'{client.client_name} DOI metadata updated')
 
         return pkg_dict
