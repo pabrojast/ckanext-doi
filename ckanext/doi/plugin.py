@@ -54,10 +54,18 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         """
         A new dataset has been created, so we need to create a new DOI.
 
-        NB: This is called after creation of a dataset, before resources have been
-        added, so state = draft.
+        NB: This hook fires *during* `package_create`, before CKAN's own
+        `model.repo.commit()`. Inserting a row into `doi` here can race with
+        the package row reaching the database — when callers create the DOI
+        themselves after `package_create` returns, they should pass
+        `_skip_doi_create=True` in the action context so we don't trigger
+        the in-hook insert and risk a foreign-key violation.
         """
+        if self._is_background_internal_update(context) or (context or {}).get('_skip_doi_create'):
+            log.debug('Skipping in-hook DOI creation due to context flag')
+            return pkg_dict
         DOIQuery.read_package(pkg_dict['id'], create_if_none=True)
+        return pkg_dict
 
     ## IPackageController
     def after_dataset_update(self, context, pkg_dict):
