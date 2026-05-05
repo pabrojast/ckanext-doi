@@ -2,10 +2,9 @@ import click
 from ckan import model
 from ckan.model import Session
 from ckan.plugins import toolkit
-from datacite.errors import DataCiteError
 
-from ckanext.doi.lib.api import DataciteClient
-from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict
+from ckanext.doi.lib.api import DataciteClient, get_client
+from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict, compute_metadata_hash
 from ckanext.doi.model import doi as doi_model
 from ckanext.doi.model.crud import DOIQuery
 from ckanext.doi.model.doi import DOI
@@ -73,17 +72,27 @@ def update_doi(package_ids):
         metadata_dict = build_metadata_dict(pkg_dict)
         xml_dict = build_xml_dict(metadata_dict)
 
-        client = DataciteClient()
+        platform = toolkit.config.get('ckanext.doi.platform', 'datacite')
+        metadata_hash = compute_metadata_hash(metadata_dict, platform)
+
+        # Skip if metadata hasn't changed
+        if record.metadata_hash == metadata_hash:
+            click.secho(f'"{title}" is already up to date (hash match)', fg='green')
+            continue
+
+        client = get_client()
 
         same = client.check_for_update(record.identifier, xml_dict)
         if not same:
             try:
                 client.set_metadata(record.identifier, xml_dict)
+                DOIQuery.update_doi(record.identifier, metadata_hash=metadata_hash)
                 click.secho(f'Updated "{title}"', fg='green')
-            except DataCiteError as e:
+            except Exception as e:
                 click.secho(
                     f'Error while updating "{title}" (DOI {record.identifier}): {e})',
                     fg='red',
                 )
         else:
+            DOIQuery.update_doi(record.identifier, metadata_hash=metadata_hash)
             click.secho(f'"{title}" is already up to date', fg='green')

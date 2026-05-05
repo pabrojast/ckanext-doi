@@ -22,6 +22,8 @@ doi_table = Table(
     ),
     # Date DOI was published to DataCite
     Column('published', types.DateTime, nullable=True),
+    # Hash of last submitted metadata to detect real changes
+    Column('metadata_hash', types.UnicodeText, nullable=True),
 )
 
 
