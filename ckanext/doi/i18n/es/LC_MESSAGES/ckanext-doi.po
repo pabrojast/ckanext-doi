@@ -1,0 +1,120 @@
+# Spanish translations for ckanext-doi.
+# Copyright (C) 2026 Natural History Museum
+# This file is distributed under the same license as the ckanext-doi project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-doi 3.1.15\n"
+"Report-Msgid-Bugs-To: data@nhm.ac.uk\n"
+"POT-Creation-Date: 2026-05-19 00:00+0000\n"
+"PO-Revision-Date: 2026-05-19 00:00+0000\n"
+"Last-Translator: UNESCO IHP-WINS <ihp-wins@unesco.org>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.10.3\n"
+
+msgid "Author Email"
+msgstr "Correo electrónico del autor"
+
+msgid "Author(s)"
+msgstr "Autor(es)"
+
+msgid "Citation copied to clipboard!"
+msgstr "¡Cita copiada al portapapeles!"
+
+msgid "Citation information not available"
+msgstr "Información de cita no disponible"
+
+msgid "Cite this as"
+msgstr "Citar como"
+
+msgid "Copy DOI to clipboard"
+msgstr "Copiar DOI al portapapeles"
+
+msgid "Copy to Clipboard"
+msgstr "Copiar al portapapeles"
+
+msgid "[Data set]"
+msgstr "[Conjunto de datos]"
+
+msgid "[Data set resource]"
+msgstr "[Recurso del conjunto de datos]"
+
+msgid "[Document]"
+msgstr "[Documento]"
+
+msgid "DOI Status:"
+msgstr "Estado del DOI:"
+
+msgid "eg. A descriptive title"
+msgstr "ej. Un título descriptivo"
+
+msgid "Error copying citation. Please copy manually."
+msgstr "Error al copiar la cita. Por favor, cópiela manualmente."
+
+msgid "Error copying DOI. Please copy manually."
+msgstr "Error al copiar el DOI. Por favor, cópielo manualmente."
+
+msgid "Export Citation"
+msgstr "Exportar cita"
+
+msgid "from"
+msgstr "de"
+
+msgid "It is available for use in manuscripts, and will be published when the Dataset is made public or updated."
+msgstr "Está disponible para su uso en manuscritos y se publicará cuando el conjunto de datos se haga público o se actualice."
+
+msgid "Joe Bloggs"
+msgstr "Juan Pérez"
+
+msgid "joe@example.com"
+msgstr "juan@ejemplo.com"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Private DOI"
+msgstr "DOI privado"
+
+msgid "Published:"
+msgstr "Publicado:"
+
+msgid "Publisher:"
+msgstr "Editor:"
+
+msgid "Retrieved:"
+msgstr "Consultado:"
+
+msgid "This dataset has been deleted."
+msgstr "Este conjunto de datos ha sido eliminado."
+
+msgid "This DOI has not yet been published"
+msgstr "Este DOI aún no ha sido publicado"
+
+msgid "This DOI is not yet resolvable."
+msgstr "Este DOI aún no es resoluble."
+
+msgid "This DOI is not yet resolvable. It will be published when the dataset is made public or updated."
+msgstr "Este DOI aún no es resoluble. Se publicará cuando el conjunto de datos se haga público o se actualice."
+
+msgid "Title"
+msgstr "Título"
+
+msgid "Dataset not found"
+msgstr "Conjunto de datos no encontrado"
+
+#, python-format
+msgid "Error exporting citation: %(error)s"
+msgstr "Error al exportar la cita: %(error)s"
+
+#, python-format
+msgid "%(platform)s DOI created"
+msgstr "DOI de %(platform)s creado"
+
+#, python-format
+msgid "%(platform)s DOI metadata updated"
+msgstr "Metadatos del DOI de %(platform)s actualizados"

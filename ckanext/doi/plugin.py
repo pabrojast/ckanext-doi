@@ -120,14 +120,14 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 client.set_metadata(doi.identifier, xml_dict)
                 client.mint_doi(doi.identifier, package_id)
                 DOIQuery.update_doi(doi.identifier, metadata_hash=metadata_hash)
-                self._flash_success_safe(f'{client.client_name} DOI created')
+                self._flash_success_safe(toolkit._('%(platform)s DOI created') % {'platform': client.client_name})
             else:
                 same = client.check_for_update(doi.identifier, xml_dict)
                 if not same:
                     # Not the same, so we want to update the metadata
                     client.set_metadata(doi.identifier, xml_dict)
                     DOIQuery.update_doi(doi.identifier, metadata_hash=metadata_hash)
-                    self._flash_success_safe(f'{client.client_name} DOI metadata updated')
+                    self._flash_success_safe(toolkit._('%(platform)s DOI metadata updated') % {'platform': client.client_name})
 
         return pkg_dict
 

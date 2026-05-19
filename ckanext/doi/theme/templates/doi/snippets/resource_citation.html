@@ -35,9 +35,9 @@ Renders a citation for a resource
                     {% endif %}
 
                     {% if authors or pkg_dict.get('author') %}
-                        ({{ h.package_get_year(pkg_dict) }}). <i>{{ res['name'] }}</i> (from <i>{{ pkg_dict['title'] }}</i>) [Data set resource]. {{ pkg_dict['doi_publisher'] }}.
+                        ({{ h.package_get_year(pkg_dict) }}). <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}. {{ pkg_dict['doi_publisher'] }}.
                     {% else %}
-                        <i>{{ res['name'] }}</i> (from <i>{{ pkg_dict['title'] }}</i>) [Data set resource]. {{ pkg_dict['doi_publisher'] }}.
+                        <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}. {{ pkg_dict['doi_publisher'] }}.
                     {% endif %}
                     {% block citation_link %}
                         {% set res_link = h.url_for('resource.read', qualified=True, id=pkg_dict['name'], resource_id=res['id']) %}

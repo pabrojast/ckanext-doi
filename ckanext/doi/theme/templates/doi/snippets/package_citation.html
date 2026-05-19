@@ -41,7 +41,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
             {% set doi_link = 'https://doi.org/' + pkg_dict['doi'] %}
         {% endif %}
 
-        {% set resource_label = '[Document]' if pkg_dict.get('type') in ['documents', 'document'] else '[Data set]' %}
+        {% set resource_label = _('[Document]') if pkg_dict.get('type') in ['documents', 'document'] else _('[Data set]') %}
         {% set has_citation_bits = authors or legacy_author or title or publisher or doi_link or pub_year %}
 
         {# --- DOI Information Bar (Zenodo-style) --- #}

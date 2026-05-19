@@ -1,0 +1,152 @@
+# Translations template for ckanext-doi.
+# Copyright (C) 2026 Natural History Museum
+# This file is distributed under the same license as the ckanext-doi project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-doi 3.1.15\n"
+"Report-Msgid-Bugs-To: data@nhm.ac.uk\n"
+"POT-Creation-Date: 2026-05-19 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: ckanext/doi/theme/templates/package/snippets/package_metadata_fields.html
+msgid "Author Email"
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/snippets/package_metadata_fields.html
+msgid "Author(s)"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Citation copied to clipboard!"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Citation information not available"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "Cite this as"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Copy DOI to clipboard"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "[Data set]"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "[Data set resource]"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "[Document]"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "DOI Status:"
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/snippets/package_basic_fields.html
+msgid "eg. A descriptive title"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Error copying citation. Please copy manually."
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Error copying DOI. Please copy manually."
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Export Citation"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "from"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "It is available for use in manuscripts, and will be published when the Dataset is made public or updated."
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/snippets/package_metadata_fields.html
+msgid "Joe Bloggs"
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/snippets/package_metadata_fields.html
+msgid "joe@example.com"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Pending"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "Private DOI"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Published:"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "Publisher:"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "Retrieved:"
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/read.html
+msgid "This dataset has been deleted."
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "This DOI has not yet been published"
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/resource_citation.html
+msgid "This DOI is not yet resolvable."
+msgstr ""
+
+#: ckanext/doi/theme/templates/doi/snippets/package_citation.html
+msgid "This DOI is not yet resolvable. It will be published when the dataset is made public or updated."
+msgstr ""
+
+#: ckanext/doi/theme/templates/package/snippets/package_basic_fields.html
+msgid "Title"
+msgstr ""
+
+#: ckanext/doi/views.py
+msgid "Dataset not found"
+msgstr ""
+
+#: ckanext/doi/views.py
+#, python-format
+msgid "Error exporting citation: %(error)s"
+msgstr ""
+
+#: ckanext/doi/plugin.py
+#, python-format
+msgid "%(platform)s DOI created"
+msgstr ""
+
+#: ckanext/doi/plugin.py
+#, python-format
+msgid "%(platform)s DOI metadata updated"
+msgstr ""

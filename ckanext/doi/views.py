@@ -44,11 +44,11 @@ def export_citation_view(id):
         return response
         
     except toolkit.ObjectNotFound:
-        toolkit.abort(404, 'Dataset not found')
+        toolkit.abort(404, toolkit._('Dataset not found'))
     except ValueError as e:
         toolkit.abort(400, str(e))
     except Exception as e:
-        toolkit.abort(500, f'Error exporting citation: {str(e)}')
+        toolkit.abort(500, toolkit._('Error exporting citation: %(error)s') % {'error': str(e)})
 
 
 def get_blueprints():

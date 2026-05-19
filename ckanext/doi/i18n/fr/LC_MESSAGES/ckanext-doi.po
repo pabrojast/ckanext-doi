@@ -1,0 +1,120 @@
+# French translations for ckanext-doi.
+# Copyright (C) 2026 Natural History Museum
+# This file is distributed under the same license as the ckanext-doi project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-doi 3.1.15\n"
+"Report-Msgid-Bugs-To: data@nhm.ac.uk\n"
+"POT-Creation-Date: 2026-05-19 00:00+0000\n"
+"PO-Revision-Date: 2026-05-19 00:00+0000\n"
+"Last-Translator: UNESCO IHP-WINS <ihp-wins@unesco.org>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 2.10.3\n"
+
+msgid "Author Email"
+msgstr "Courriel de l'auteur"
+
+msgid "Author(s)"
+msgstr "Auteur(s)"
+
+msgid "Citation copied to clipboard!"
+msgstr "Citation copiée dans le presse-papiers !"
+
+msgid "Citation information not available"
+msgstr "Informations de citation non disponibles"
+
+msgid "Cite this as"
+msgstr "Citer comme"
+
+msgid "Copy DOI to clipboard"
+msgstr "Copier le DOI dans le presse-papiers"
+
+msgid "Copy to Clipboard"
+msgstr "Copier dans le presse-papiers"
+
+msgid "[Data set]"
+msgstr "[Jeu de données]"
+
+msgid "[Data set resource]"
+msgstr "[Ressource du jeu de données]"
+
+msgid "[Document]"
+msgstr "[Document]"
+
+msgid "DOI Status:"
+msgstr "Statut du DOI :"
+
+msgid "eg. A descriptive title"
+msgstr "ex. Un titre descriptif"
+
+msgid "Error copying citation. Please copy manually."
+msgstr "Erreur lors de la copie de la citation. Veuillez la copier manuellement."
+
+msgid "Error copying DOI. Please copy manually."
+msgstr "Erreur lors de la copie du DOI. Veuillez le copier manuellement."
+
+msgid "Export Citation"
+msgstr "Exporter la citation"
+
+msgid "from"
+msgstr "de"
+
+msgid "It is available for use in manuscripts, and will be published when the Dataset is made public or updated."
+msgstr "Il est disponible pour utilisation dans les manuscrits, et sera publié lorsque le jeu de données sera rendu public ou mis à jour."
+
+msgid "Joe Bloggs"
+msgstr "Jean Dupont"
+
+msgid "joe@example.com"
+msgstr "jean@exemple.com"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Private DOI"
+msgstr "DOI privé"
+
+msgid "Published:"
+msgstr "Publié :"
+
+msgid "Publisher:"
+msgstr "Éditeur :"
+
+msgid "Retrieved:"
+msgstr "Consulté :"
+
+msgid "This dataset has been deleted."
+msgstr "Ce jeu de données a été supprimé."
+
+msgid "This DOI has not yet been published"
+msgstr "Ce DOI n'a pas encore été publié"
+
+msgid "This DOI is not yet resolvable."
+msgstr "Ce DOI n'est pas encore résoluble."
+
+msgid "This DOI is not yet resolvable. It will be published when the dataset is made public or updated."
+msgstr "Ce DOI n'est pas encore résoluble. Il sera publié lorsque le jeu de données sera rendu public ou mis à jour."
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Dataset not found"
+msgstr "Jeu de données introuvable"
+
+#, python-format
+msgid "Error exporting citation: %(error)s"
+msgstr "Erreur lors de l'exportation de la citation : %(error)s"
+
+#, python-format
+msgid "%(platform)s DOI created"
+msgstr "DOI %(platform)s créé"
+
+#, python-format
+msgid "%(platform)s DOI metadata updated"
+msgstr "Métadonnées du DOI %(platform)s mises à jour"
