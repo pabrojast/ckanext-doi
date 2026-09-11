@@ -79,6 +79,24 @@ def get_doi_platform():
     return toolkit.config.get('ckanext.doi.platform', 'datacite')
 
 
+def get_citation_publisher(pkg_dict, default=''):
+    """Keep external DOI citations independent of the portal's DOI publisher."""
+    external_doi = any(
+        (pkg_dict.get(field) or '').strip()
+        for field in ('custom_doi', 'document_doi')
+    )
+    fields = ('publisher_name', 'publisher')
+    if not external_doi:
+        fields = ('doi_publisher',) + fields
+
+    for field in fields:
+        publisher = (pkg_dict.get(field) or '').strip()
+        if publisher:
+            return publisher
+
+    return '' if external_doi else default
+
+
 def parse_json_authors(authors_json):
     """
     Helper function to parse JSON authors field in templates.

@@ -18,6 +18,7 @@ from ckanext.doi.lib.helpers import (
     package_get_year,
     doi_test_mode,
     get_doi_platform,
+    get_citation_publisher,
     parse_json_authors,
 )
 from ckanext.doi.lib.metadata import build_metadata_dict, build_xml_dict, compute_metadata_hash
@@ -202,6 +203,7 @@ class DOIPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'doi_test_mode': doi_test_mode,
             'get_doi_platform': get_doi_platform,
             'parse_json_authors': parse_json_authors,
+            'doi_get_citation_publisher': get_citation_publisher,
         }
 
     # IBlueprint

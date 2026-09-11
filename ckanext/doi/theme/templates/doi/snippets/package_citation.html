@@ -12,7 +12,7 @@ Enhanced citation template with Zenodo-style layout and DOI information
         {% set authors = h.parse_json_authors(authors_data) if authors_data else [] %}
         {% set title = pkg_dict.get('title') %}
         {% set pub_year = pkg_dict.get('publication_year') %}
-        {% set publisher = pkg_dict.get('doi_publisher') or pkg_dict.get('publisher_name') or pkg_dict.get('publisher') %}
+        {% set publisher = h.doi_get_citation_publisher(pkg_dict) %}
         {% set doi_link = None %}
 
         {# Fallback to translated titles when a plain title is not present #}
@@ -173,8 +173,8 @@ Enhanced citation template with Zenodo-style layout and DOI information
             <small class="text-muted">
                 <i class="fa fa-calendar"></i>
                 {{ _('Published:') }} {{ pkg_dict['doi_date_published'] }}
-                {% if pkg_dict.get('doi_publisher') %}
-                    | {{ _('Publisher:') }} {{ pkg_dict['doi_publisher'] }}
+                {% if publisher %}
+                    | {{ _('Publisher:') }} {{ publisher }}
                 {% endif %}
             </small>
         </div>

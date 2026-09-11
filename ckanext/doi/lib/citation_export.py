@@ -6,7 +6,11 @@
 
 from datetime import datetime
 from ckan.plugins import toolkit
-from ckanext.doi.lib.helpers import package_get_year, parse_json_authors
+from ckanext.doi.lib.helpers import (
+    get_citation_publisher,
+    package_get_year,
+    parse_json_authors,
+)
 
 
 def get_title(pkg_dict):
@@ -44,14 +48,10 @@ def get_publication_year(pkg_dict):
 
 
 def get_publisher(pkg_dict):
-    """
-    Prefer DOI publisher overrides, then publisher_name/publisher fields, then config default.
-    """
-    return (
-        pkg_dict.get('doi_publisher')
-        or pkg_dict.get('publisher_name')
-        or pkg_dict.get('publisher')
-        or toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher')
+    """Use the same publisher as the citation, retaining native DOI defaults."""
+    return get_citation_publisher(
+        pkg_dict,
+        default=toolkit.config.get('ckanext.doi.publisher', 'Unknown Publisher'),
     )
 
 
@@ -114,8 +114,10 @@ def export_bibtex(pkg_dict):
     bibtex = f"""@dataset{{{bibtex_id},
     title = {{{title}}},
     author = {{{author_str}}},
-    year = {{{year}}},
-    publisher = {{{publisher}}},"""
+    year = {{{year}}},"""
+
+    if publisher:
+        bibtex += f"\n    publisher = {{{publisher}}},"
     
     if doi_url:
         bibtex += f"\n    doi = {{{doi_url.replace('https://doi.org/', '')}}},"
@@ -148,7 +150,8 @@ def export_ris(pkg_dict):
             ris += f"AU  - {author['name']}\n"
     
     ris += f"PY  - {year}\n"
-    ris += f"PB  - {publisher}\n"
+    if publisher:
+        ris += f"PB  - {publisher}\n"
     
     if doi_url:
         ris += f"DO  - {doi_url.replace('https://doi.org/', '')}\n"
@@ -179,7 +182,8 @@ def export_endnote(pkg_dict):
             endnote += f"%A {author['name']}\n"
     
     endnote += f"%D {year}\n"
-    endnote += f"%I {publisher}\n"
+    if publisher:
+        endnote += f"%I {publisher}\n"
     
     if doi_url:
         endnote += f"%R {doi_url.replace('https://doi.org/', '')}\n"
@@ -212,11 +216,12 @@ def export_apa(pkg_dict):
     
     # Build APA citation
     apa = f"{author_str} ({year}). "
-    apa += f"<em>{title}</em> [Data set]. "
-    apa += f"{publisher}"
+    apa += f"<em>{title}</em> [Data set]."
+    if publisher:
+        apa += f" {publisher}"
     
     if doi_url:
-        apa += f". {doi_url}"
+        apa += f". {doi_url}" if publisher else f" {doi_url}"
     
     return apa
 

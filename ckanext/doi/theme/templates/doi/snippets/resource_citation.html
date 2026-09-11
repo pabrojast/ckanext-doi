@@ -23,6 +23,7 @@ Renders a citation for a resource
 
                 {# --- 2) Default generated citation ------------------------------------ #}
                 {% else %}
+                    {% set publisher = h.doi_get_citation_publisher(pkg_dict) %}
                     {% set authors_data = pkg_dict.get('authors') or pkg_dict.get('authors_json') %}
                     {% set authors = h.parse_json_authors(authors_data) %}
 
@@ -35,10 +36,11 @@ Renders a citation for a resource
                     {% endif %}
 
                     {% if authors or pkg_dict.get('author') %}
-                        ({{ h.package_get_year(pkg_dict) }}). <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}. {{ pkg_dict['doi_publisher'] }}.
+                        ({{ h.package_get_year(pkg_dict) }}). <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}.
                     {% else %}
-                        <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}. {{ pkg_dict['doi_publisher'] }}.
+                        <i>{{ res['name'] }}</i> ({{ _('from') }} <i>{{ pkg_dict['title'] }}</i>) {{ _('[Data set resource]') }}.
                     {% endif %}
+                    {% if publisher %}{{ publisher }}.{% endif %}
                     {% block citation_link %}
                         {% set res_link = h.url_for('resource.read', qualified=True, id=pkg_dict['name'], resource_id=res['id']) %}
                         <a href="{{ res_link }}" target="_blank">
